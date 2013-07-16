@@ -1,0 +1,164 @@
+native class bit {
+    bit ~a;
+
+    -- native constructor that sets a
+    native bit();
+
+    -- compiles to a connecting to b
+    native bit =(bit b);
+
+    -- compiles to not gate 
+    native bit !();
+
+    -- compiles to or gate
+    native bit |(bit b);
+
+    bit &(bit b) {
+        return !(a !& b);
+    }
+
+    bit !|(bit b) {
+        return !(a | b);
+    }
+
+    bit !&(bit b) {
+        return !a | !b;
+    }
+}
+
+native class repeater<delay> {
+    bit in;
+    bit ~out;
+
+    -- native constructor that sets in and out
+    native repeater();
+}
+
+class bitpair {
+    bit bits[2];
+
+    bitpair &(bitpair b) {
+        return 
+    }
+
+    -- default behavior
+    bitpair =(bitpair b) {
+        b.bits[0] = bits[0];
+        b.bits[1] = bits[1];
+        return this;
+    }
+}
+
+
+class and {
+    bit a;
+    bit b;
+    bit ~out;
+
+    (bit) -and(bit a, bit b) {
+        return new and(a, b);
+    }
+
+    and() {
+        this.out = a & b;
+    }
+
+    and(bit a, bit b) {
+        this();
+
+        this.a = a;
+        this.b = b;
+    }
+}
+
+class rsnor {
+    bit rst;
+    bit set;
+
+    bit ~out;
+    bit inv;
+
+    (bit, bit) -rsnor(bit rst, bit set) {
+        rsnor inst(rst, set);
+        return rsnor.out, rsnor.inv;
+    }
+
+    rsnor() {
+        this.out = rst !| (set !| out);
+        this.inv = !out;
+    }
+
+    rsnor(bit rst, bit set) {
+        this();
+        this.rst = rst;
+        this.set = set;
+    }
+}
+
+class cell {
+    rsnor latch;
+    bit dat;
+    bit clk;
+    bit out;
+    bit rst;
+
+    cell() {
+        and andA;
+        and andB{
+            out: rst
+        };
+
+        andA.a = !dat;
+        andA.b = clk;
+
+        andB.a = clk;
+        andB.b = dat;
+
+        this.latch = new rsnor{
+            out: out,
+            set: andA.out,
+            rst: andB.out
+        };
+    }
+
+}
+
+#for(string init, string condition, string afterthought) {
+    // TODO ADD CONST TOKENS TO VM!!!
+    var vm = new vm();
+    vm.eval(init);
+
+    while(vm.eval(condition)) {
+        emit(code, vm.globals);
+        vm.eval(afterthought);
+    }
+}
+
+class sector<c> {
+    cell cells[c];
+    bit rst;
+
+    sector() {
+        #for(i = 0; i < c; i++) {
+            cells[i].latch.rst = rst;
+        }
+    }
+}
+
+-- compiles into rsnorlatch
+(bit) main(bit rst, bit set) {
+    return rsnor(rst, set);
+}
+
+class clock {
+    bit a;
+
+    (bit) -clock() {
+        clock clk;
+        return clk.a;
+    }
+
+    clock() {
+        this.a = !a;
+    }
+}
