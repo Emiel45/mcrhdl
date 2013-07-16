@@ -1,9 +1,11 @@
 package net.mcrhdl.compiler.tokenizer;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import java.util.List;
+import java.util.Map;
+
 public enum TokenType {
-    NIGGER, NATIVE, CLASS, RETURN,
-
-    GAY, PEOPLE, ARE, STUPID,
-
-    COMMA, SEMI_COLON, COLON, LPAREN, RPAREN, LCURLY, RCURLY, LBRACKET, RBRACKET
+    KEYWORD, OPERATOR, SYMBOL, LITERAL;
 }
