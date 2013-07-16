@@ -46,7 +46,15 @@ public class Tokenizer {
                 String temp = String.valueOf(c);
                 while(!charIsWhitespace())
                 {
-                    temp += nextChar();
+                    char t = nextChar();
+                    if(TOKENS.containsKey(String.valueOf(t)) && TOKENS.get(String.valueOf(t)) != null)
+                    {
+                        tokens.add(new Token(TOKENS.get(String.valueOf(t)), String.valueOf(t)));
+                    }
+                    else
+                    {
+                        temp += t;
+                    }
                 }
                 if(!TOKENS.containsKey(temp))
                 {
