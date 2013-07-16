@@ -85,9 +85,13 @@ public enum TokenType {
     FUTURE_RESERVED_WORD(false, null, 0),
     FUTURE_STRICT_RESERVED_WORD(false, null, 0),
 
+    /* Error reporting only */
     /* Comments */
+    NEWLINE(false, "\n", 0),
+    STRING_QUOTE(false, "\"", 0),
     LINE_COMMENT(false, "//", 0),
-    LMULTI_LINE_COMMENT(false, "/*", 0),
+    LMULTI_LINE_COMMENT_BEGIN(false, "/*", 0),
+    LMULTI_LINE_COMMENT_END(false, "/*", 0),
 
     /* Illegal token - not able to scan. */
     ILLEGAL(false, "ILLEGAL", 0),

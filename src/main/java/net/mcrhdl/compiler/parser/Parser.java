@@ -74,7 +74,7 @@ public class Parser {
     }
 
     private DeclarationST codeDeclaration(ProgramST p) {
-
+        return null;
     }
 
     private Token getToken() {

@@ -1,3 +1,6 @@
+/**
+ * Default bit class.
+ */
 native class bit {
     bit ~a;
 

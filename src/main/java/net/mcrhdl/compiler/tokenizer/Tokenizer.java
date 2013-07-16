@@ -2,16 +2,21 @@ package net.mcrhdl.compiler.tokenizer;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.io.IOException;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 
 public class Tokenizer {
+    public static HashMap<String, TokenType> KEYWORDS  = Maps.newHashMap();
+    public static HashMap<String, TokenType> OPERATORS = Maps.newHashMap();
+
     private int index;
     private char[] code;
 
-    public static HashMap<String, TokenType> KEYWORDS  = Maps.newHashMap();
-    public static HashMap<String, TokenType> OPERATORS = Maps.newHashMap();
+    private EnumSet<TokenType> expectedTokens;
 
     public Tokenizer(char[] code) {
         this.code = code;
@@ -27,14 +32,30 @@ public class Tokenizer {
         return true;
     }
 
-    public List<Token> tokenize() {
+    public List<Token> tokenize() throws IOException {
         List<Token> tokens = Lists.newArrayList();
 
         while(index < code.length) {
             //System.out.println(index + ", '" + getChar() + "'");
 
-            while(charIsWhitespace()) {
-                  nextChar();
+            skipWhitespace();
+
+            while(getChar() == '/') {
+                nextChar();
+                if(getChar() == '/') {
+                    expect(EnumSet.of(TokenType.NEWLINE));
+                    while(nextChar() != '\n');
+                } else if(getChar() == '*') {
+                    expect(EnumSet.of(TokenType.LMULTI_LINE_COMMENT_END));
+                    nextChar();
+                    while(!(nextChar() == '*' && nextChar() == '/'));
+                    nextChar();
+                } else {
+                    prevChar();
+                    break;
+                }
+
+                skipWhitespace();
             }
 
             StringBuilder tokenBuilder = new StringBuilder();
@@ -57,23 +78,14 @@ public class Tokenizer {
             // Add the operator token
             if(OPERATORS.containsKey(tokenBuilder.toString())) {
                 TokenType type = OPERATORS.get(tokenBuilder.toString());
-
-                if(type == TokenType.LINE_COMMENT) {
-                    //System.out.println("COMMENT");
-                    while(getChar() != '\n' && getChar() != '\r') {
-                        nextChar();
-                    }
-                } else if(type == TokenType.LMULTI_LINE_COMMENT) {
-                    // TODO: Get off my ass and work
-                } else {
-                    tokens.add(new Token(type, tokenBuilder.toString()));
-                }
+                tokens.add(new Token(type, tokenBuilder.toString()));
             }
 
             tokenBuilder = new StringBuilder();
 
             // Add literals or idents
             if(getChar() == '"') {
+                expect(EnumSet.of(TokenType.STRING_QUOTE));
                 nextChar();
                 while(getChar() != '"') {
                     tokenBuilder.append(getChar());
@@ -87,6 +99,12 @@ public class Tokenizer {
                     tokenBuilder.append(getChar());
                     nextChar();
                 }
+
+                expect(EnumSet.of(TokenType.WHITESPACE));
+                if(!charIsWhitespace()) {
+                    throw new UnexpectedTokenException();
+                }
+
                 tokens.add(new Token(TokenType.NUMBER, tokenBuilder.toString()));
             } else if(charIsAlpha()) {
                 tokenBuilder.append(getChar());
@@ -97,7 +115,7 @@ public class Tokenizer {
                 }
                 tokens.add(new Token(TokenType.IDENTIFIER, tokenBuilder.toString()));
             } else if(getChar() == '#') {
-                throw new RuntimeException("Macros not yet implemented.");
+                throw new NotImplementedException();
 
                 /* String name = null;
                 List<String> argumentTypes = Lists.newArrayList();
@@ -126,35 +144,49 @@ public class Tokenizer {
         return tokens;
     }
 
-    private char getChar() {
+    public void expect(EnumSet<TokenType> tokens) {
+        this.expectedTokens = tokens;
+    }
+
+    public EnumSet<TokenType> getExpectedTokens() {
+        return expectedTokens;
+    }
+
+    private void skipWhitespace() throws EOSReachedException {
+        while(charIsWhitespace()) {
+              nextChar();
+        }
+    }
+
+    private char getChar() throws EOSReachedException {
         if(index < code.length) {
             return code[index];
         }
 
-        return 0;
+        throw new EOSReachedException();
     }
 
-    private char nextChar() {
+    private char nextChar() throws EOSReachedException {
         index++;
         return getChar();
     }
 
-    private char prevChar() {
+    private char prevChar() throws EOSReachedException {
         index--;
         return getChar();
     }
 
-    private boolean charIsWhitespace() {
+    private boolean charIsWhitespace() throws EOSReachedException {
         char c = getChar();
         return c == ' ' || c == '\n' || c == '\t' || c == '\r';
     }
 
-    private boolean charIsAlpha() {
+    private boolean charIsAlpha() throws EOSReachedException {
         char c = getChar();
         return (c >= 65 && c <= 90) || (c >= 97 && c <= 122);
     }
 
-    private boolean charIsDigit() {
+    private boolean charIsDigit() throws EOSReachedException {
         char c = getChar();
         return c >= 48 && c <= 57;
     }

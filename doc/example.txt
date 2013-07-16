@@ -1,4 +1,4 @@
-native class bit {
+class bit {
     bit ~a;
 
     -- native constructor that sets a
@@ -26,7 +26,7 @@ native class bit {
     }
 }
 
-native class repeater<delay> {
+class repeater<delay> {
     bit in;
     bit ~out;
 
@@ -123,7 +123,7 @@ class cell {
 
 }
 
-#for(string init, string condition, string afterthought) {
+macro for(string init, string condition, string afterthought) {
     // TODO ADD CONST TOKENS TO VM!!!
     var vm = new vm();
     vm.eval(init);
@@ -146,7 +146,7 @@ class sector<c> {
 }
 
 -- compiles into rsnorlatch
-(bit) main(bit rst, bit set) {
+function bit main(bit rst, bit set) {
     return rsnor(rst, set);
 }
 
