@@ -1,17 +1,11 @@
 package net.mcrhdl.compiler.tokenizer;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import java.util.List;
-import java.util.Map;
-
 public enum TokenType {
     /* Normal operators. */
     // End of source indicator.
     EOS(false, null, 0),
 
-    // Punctuators.
+    /* Punctuators. */
     LPAREN(false, "(", 0),
     RPAREN(false, ")", 0),
     LBRACK(false, "[", 0),
@@ -31,7 +25,7 @@ public enum TokenType {
     NOT(false, "!", 0),
     BIT_NOT(false, "~", 0),
 
-    // Assignment operators.
+    /* Assignment operators. */
     ASSIGN(false, "=", 2),
     ASSIGN_BIT_OR(false, "|=", 2),
     ASSIGN_BIT_XOR(false, "^=", 2),
@@ -45,7 +39,7 @@ public enum TokenType {
     ASSIGN_DIV(false, "/=", 2),
     ASSIGN_MOD(false, "%=", 2),
 
-    // Binary operators.
+    /* Binary operators. */
     OR(false, "||", 4),
     AND(false, "&&", 5),
     BIT_OR(false, "|", 6),
@@ -60,7 +54,7 @@ public enum TokenType {
     DIV(false, "/", 13),
     MOD(false, "%", 13),
 
-    // Compare operators.
+    /* Compare operators. */
     EQ(false, "==", 9),
     NE(false, "!=", 9),
     EQ_STRICT(false, "===", 9),
@@ -79,12 +73,19 @@ public enum TokenType {
     NUMBER(false, null, 0),
     STRING(false, null, 0),
 
+    /* Macros */
+    MACRO(false, null, 0),
+
     /* Identifiers. */
     IDENTIFIER(false, null, 0),
 
     /* Future reserved words. */
     FUTURE_RESERVED_WORD(false, null, 0),
     FUTURE_STRICT_RESERVED_WORD(false, null, 0),
+
+    /* Comments */
+    LINE_COMMENT(false, "//", 0),
+    LMULTI_LINE_COMMENT(false, "/*", 0),
 
     /* Illegal token - not able to scan. */
     ILLEGAL(false, "ILLEGAL", 0),
@@ -100,7 +101,12 @@ public enum TokenType {
         this.keyword = keyword;
         this.identifier = identifier;
         this.precedence = precedence;
-        Tokenizer.TOKENS.put(identifier, this);
+
+        if(keyword) {
+            Tokenizer.KEYWORDS.put(identifier, this);
+        } else {
+            Tokenizer.OPERATORS.put(identifier, this);
+        }
     }
 
     public int getPrecedence() {

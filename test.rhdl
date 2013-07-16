@@ -1,16 +1,16 @@
 native class bit {
     bit ~a;
 
-    -- native constructor that sets a
+    // native constructor that sets a
     native bit();
 
-    -- compiles to a connecting to b
+    // compiles to a connecting to b
     native bit =(bit b);
 
-    -- compiles to not gate
+    // compiles to not gate
     native bit !();
 
-    -- compiles to or gate
+    // compiles to or gate
     native bit |(bit b);
 
     bit &(bit b) {
@@ -30,7 +30,7 @@ native class repeater<delay> {
     bit in;
     bit ~out;
 
-    -- native constructor that sets in and out
+    // native constructor that sets in and out
     native repeater();
 }
 
@@ -41,7 +41,7 @@ class bitpair {
         return
     }
 
-    -- default behavior
+    // default behavior
     bitpair =(bitpair b) {
         b.bits[0] = bits[0];
         b.bits[1] = bits[1];
@@ -123,29 +123,16 @@ class cell {
 
 }
 
-#for(string init, string condition, string afterthought) {
-    // TODO ADD CONST TOKENS TO VM!!!
-    var vm = new vm();
-    vm.eval(init);
-
-    while(vm.eval(condition)) {
-        emit(code, vm.globals);
-        vm.eval(afterthought);
-    }
-}
-
 class sector<c> {
     cell cells[c];
     bit rst;
 
     sector() {
-        #for(i = 0; i < c; i++) {
-            cells[i].latch.rst = rst;
-        }
+
     }
 }
 
--- compiles into rsnorlatch
+// compiles into rsnorlatch
 (bit) main(bit rst, bit set) {
     return rsnor(rst, set);
 }
