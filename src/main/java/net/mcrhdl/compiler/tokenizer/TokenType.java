@@ -68,6 +68,8 @@ public enum TokenType {
     NEW(true, "new", 0),
     RETURN(true, "return", 0),
     THIS(true, "this", 0),
+    CLASS(true, "class", 0),
+    NATIVE(true, "native", 0),
 
     /* Literals. */
     NUMBER(false, null, 0),
