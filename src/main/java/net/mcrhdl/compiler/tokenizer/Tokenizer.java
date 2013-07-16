@@ -46,6 +46,8 @@ public class Tokenizer {
                 String temp = String.valueOf(c);
                 while(!charIsWhitespace())
                 {
+                    if(index >= code.length-1)
+                        break;
                     char t = nextChar();
                     if(TOKENS.containsKey(String.valueOf(t)) && TOKENS.get(String.valueOf(t)) != null)
                     {
