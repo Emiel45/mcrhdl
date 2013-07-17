@@ -16,6 +16,8 @@ public class Tokenizer {
     private int index;
     private char[] code;
 
+    private int column, line;
+
     private EnumSet<TokenType> expectedTokens;
 
     public Tokenizer(char[] code) {
@@ -34,11 +36,13 @@ public class Tokenizer {
 
     public List<Token> tokenize() throws IOException {
         List<Token> tokens = Lists.newArrayList();
+        int scolumn, sline;
 
-        while(index < code.length) {
+        while(isCharRemaining()) {
             //System.out.println(index + ", '" + getChar() + "'");
 
             skipWhitespace();
+            if(!isCharRemaining()) break;
 
             while(getChar() == '/') {
                 nextChar();
@@ -58,7 +62,12 @@ public class Tokenizer {
                 skipWhitespace();
             }
 
+            if(!isCharRemaining()) break;
+
             StringBuilder tokenBuilder = new StringBuilder();
+
+            scolumn = column;
+            sline = line;
 
             tokenBuilder.append(getChar());
             nextChar();
@@ -78,10 +87,13 @@ public class Tokenizer {
             // Add the operator token
             if(OPERATORS.containsKey(tokenBuilder.toString())) {
                 TokenType type = OPERATORS.get(tokenBuilder.toString());
-                tokens.add(new Token(type, tokenBuilder.toString()));
+                tokens.add(new Token(type, tokenBuilder.toString(), scolumn, sline));
             }
 
             tokenBuilder = new StringBuilder();
+
+            scolumn = column;
+            sline = line;
 
             // Add literals or idents
             if(getChar() == '"') {
@@ -91,7 +103,7 @@ public class Tokenizer {
                     tokenBuilder.append(getChar());
                     nextChar();
                 }
-                tokens.add(new Token(TokenType.STRING, tokenBuilder.toString()));
+                tokens.add(new Token(TokenType.STRING, tokenBuilder.toString(), scolumn, sline));
                 nextChar();
             } else if(charIsDigit()) {
                 // TODO: Proper number parsing with decimal places (is this needed)
@@ -100,12 +112,12 @@ public class Tokenizer {
                     nextChar();
                 }
 
-                expect(EnumSet.of(TokenType.WHITESPACE));
+                /*expect(EnumSet.of(TokenType.WHITESPACE));
                 if(!charIsWhitespace()) {
-                    throw new UnexpectedTokenException();
-                }
+                    throw new UnexpectedTokenException(column, line);
+                }*/
 
-                tokens.add(new Token(TokenType.NUMBER, tokenBuilder.toString()));
+                tokens.add(new Token(TokenType.NUMBER, tokenBuilder.toString(), scolumn, sline));
             } else if(charIsAlpha()) {
                 tokenBuilder.append(getChar());
                 nextChar();
@@ -113,7 +125,7 @@ public class Tokenizer {
                     tokenBuilder.append(getChar());
                     nextChar();
                 }
-                tokens.add(new Token(TokenType.IDENTIFIER, tokenBuilder.toString()));
+                tokens.add(new Token(TokenType.IDENTIFIER, tokenBuilder.toString(), scolumn, sline));
             } else if(getChar() == '#') {
                 throw new NotImplementedException();
 
@@ -153,9 +165,11 @@ public class Tokenizer {
     }
 
     private void skipWhitespace() throws EOSReachedException {
-        while(charIsWhitespace()) {
-              nextChar();
-        }
+        try {
+            while(charIsWhitespace()) {
+                  nextChar();
+            }
+        } catch(EOSReachedException e) { }
     }
 
     private char getChar() throws EOSReachedException {
@@ -163,16 +177,49 @@ public class Tokenizer {
             return code[index];
         }
 
+        System.out.println();
         throw new EOSReachedException();
     }
 
     private char nextChar() throws EOSReachedException {
+        char c = getChar();
+
+        if(c == '\n') {
+            column = 0;
+            line++;
+        } else if(c != '\r') {
+            column++;
+        }
+
         index++;
-        return getChar();
+
+        try {
+            return getChar();
+        } catch(EOSReachedException e) {
+            return 0;
+        }
     }
 
     private char prevChar() throws EOSReachedException {
+        char c;
+        try {
+            c = getChar();
+        } catch(EOSReachedException e) {
+            c = 0;
+        }
+
+        if(c == '\n') {
+            int i = 0;
+            for(; code[index - i] != '\n' && code[index - i] != '\r'; i++);
+            column = i;
+            line--;
+        } else if(c != '\r') {
+            column--;
+        }
+
         index--;
+
+
         return getChar();
     }
 
@@ -189,5 +236,9 @@ public class Tokenizer {
     private boolean charIsDigit() throws EOSReachedException {
         char c = getChar();
         return c >= 48 && c <= 57;
+    }
+
+    private boolean isCharRemaining() {
+        return index < code.length;
     }
 }

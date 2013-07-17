@@ -16,7 +16,7 @@ public class TEST
 
         BufferedReader reader = new BufferedReader(new FileReader(f));
         String dataToTokenize = "";
-        String line = "";
+        String line;
         while((line = reader.readLine()) != null)
         {
             dataToTokenize += line + "\n";
@@ -27,7 +27,7 @@ public class TEST
         List<Token> tokens = tokenizer.tokenize();
         for(Token t : tokens)
         {
-            System.out.println(t.getType() + " " + t.getData());
+            System.out.println(t);
         }
     }
 }
