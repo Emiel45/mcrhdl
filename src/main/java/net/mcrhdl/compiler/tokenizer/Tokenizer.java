@@ -95,7 +95,7 @@ public class Tokenizer {
             scolumn = column;
             sline = line;
 
-            // Add literals or idents
+            // Add literals, idents, or keywords
             if(getChar() == '"') {
                 expect(EnumSet.of(TokenType.STRING_QUOTE));
                 nextChar();
@@ -125,7 +125,7 @@ public class Tokenizer {
                     tokenBuilder.append(getChar());
                     nextChar();
                 }
-                tokens.add(new Token(TokenType.IDENTIFIER, tokenBuilder.toString(), scolumn, sline));
+                tokens.add(new Token(TokenType.IDENT, tokenBuilder.toString(), scolumn, sline));
             } else if(getChar() == '#') {
                 throw new NotImplementedException();
 

@@ -1,4 +1,4 @@
-package net.mcrhdl.compiler.parser;
+package net.mcrhdl.compiler.parser.tree;
 
 public class ArrayDeclarationST extends DeclarationST {
     public String type, name;

@@ -1,4 +1,4 @@
-package net.mcrhdl.compiler.parser;
+package net.mcrhdl.compiler.parser.tree;
 
 import net.mcrhdl.compiler.tokenizer.Token;
 

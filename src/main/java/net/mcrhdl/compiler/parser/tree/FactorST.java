@@ -1,4 +1,4 @@
-package net.mcrhdl.compiler.parser;
+package net.mcrhdl.compiler.parser.tree;
 
 public abstract class FactorST extends ExpressionST {
 }

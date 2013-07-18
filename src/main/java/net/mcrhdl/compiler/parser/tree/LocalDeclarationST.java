@@ -1,4 +1,4 @@
-package net.mcrhdl.compiler.parser;
+package net.mcrhdl.compiler.parser.tree;
 
 public class LocalDeclarationST extends DeclarationST {
     public String type, name;

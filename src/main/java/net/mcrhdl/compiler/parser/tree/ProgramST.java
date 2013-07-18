@@ -1,6 +1,7 @@
-package net.mcrhdl.compiler.parser;
+package net.mcrhdl.compiler.parser.tree;
 
 import com.google.common.collect.Lists;
+import net.mcrhdl.compiler.parser.SyntaxTree;
 
 import java.util.List;
 

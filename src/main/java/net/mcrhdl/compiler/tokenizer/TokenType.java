@@ -79,7 +79,7 @@ public enum TokenType {
     MACRO(false, null, 0),
 
     /* Identifiers. */
-    IDENTIFIER(false, null, 0),
+    IDENT(false, null, 0),
 
     /* Future reserved words. */
     FUTURE_RESERVED_WORD(false, null, 0),
